@@ -15,24 +15,68 @@ class Waitlist:
 
     def __len__(self):
         """Return number of people on the waitlist."""
-        ...
+        return self._size
 
     def to_list(self):
         """Return names from head to tail as a Python list."""
-        ...
+        result = []
+        curr = self.head
+        while curr:
+            result.append(curr.name)
+            curr = curr.next
+        return result
 
     def join(self, name):
         """Append name at the tail (O(1))."""
-        ...
+        new_node = _Node(name)
+        if not self.head:  # list is empty
+            self.head = self.tail = new_node
+        else:
+            self.tail.next = new_node
+            self.tail = new_node
+        self._size += 1
 
     def find(self, name):
         """Return True if name exists, else False."""
-        ...
+        curr = self.head
+        while curr:
+            if curr.name == name:
+                return True
+            curr = curr.next
+        return False
 
     def cancel(self, name):
         """Remove first occurrence; return True if removed."""
-        ...
+        prev, curr = None, self.head
+        while curr:
+            if curr.name == name:
+                if prev:  # not head
+                    prev.next = curr.next
+                else:  # removing head
+                    self.head = curr.next
+                if curr == self.tail:  # removing tail
+                    self.tail = prev
+                self._size -= 1
+                return True
+            prev, curr = curr, curr.next
+        return False
 
     def bump(self, name):
         """Move first occurrence to the head; return True if moved."""
+        if not self.head or self.head.name == name:
+            return bool(self.head)  # already at head or empty
 
+        prev, curr = None, self.head
+        while curr:
+            if curr.name == name:
+                # Remove node from current position
+                if prev:
+                    prev.next = curr.next
+                if curr == self.tail:
+                    self.tail = prev
+                # Insert at head
+                curr.next = self.head
+                self.head = curr
+                return True
+            prev, curr = curr, curr.next
+        return False
